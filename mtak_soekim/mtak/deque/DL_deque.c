@@ -1,4 +1,3 @@
-
 #include "DL_deque.h"
 
 void error(char *msg)
@@ -98,4 +97,3 @@ void view(Deque *dq)
 	for (itr = dq->head; itr; itr = itr->rlink)
 		printf("%d\n", itr->data);
 }
-

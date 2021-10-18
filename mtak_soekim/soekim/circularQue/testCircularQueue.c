@@ -2,40 +2,67 @@
 
 void view(CircularQueue q)
 {
-	for (int i = q.front; i != (q.rear + 1)% q.maxElementCount;)
+	if (q.isEmpty)
 	{
-		printf("q[%d] : %c\n", i, q.elements[i]);
-		i = (i + 1) % q.maxElementCount;
+		printf("Empty queue\n\n");
+		return;
 	}
+	int i = q.front - 1;
+	do
+	{
+		moveInCircular(&i, 1, q.maxElementCount);
+		printf("q[%d] : %d\n", i, q.elements[i]);
+	} while (i != q.rear);
 }
 
-int main() {
-	CircularQueue* q = createCircularQueue(10);
+int main()
+{
+	CircularQueue *q = createCircularQueue(8);
+	for (int i = 0; i < 8; ++i)
+	{
+		if (!put(q, i))
+			printf("%d failed\n", i);
+		else
+			printf("put %d\n", i);
+	}
+	printf("\n\nis full : %d\n\n", isCircularQueueFull(q));
 
-	printf("[enque 10 번]\n");
-	for (char data = 'a'; data < 'a'+ 11; data++)
-		put(q, data);
+	printf("\n\ncurrent : %d\n\n", getCQCurrentCount(q));
+
+	for (int i = 0; i < 5; ++i)
+	{
+		printf("%d get %d\n", i, get(q));
+	}
+
+	printf("\n\nis full : %d\n\n", isCircularQueueFull(q));
+
+	printf("\n\ncurrent : %d\n\n", getCQCurrentCount(q));
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (!put(q, i))
+			printf("%d failed\n", i);
+		else
+			printf("put %d\n", i);
+	}
+	printf("\n\nis full : %d\n\n", isCircularQueueFull(q));
+
+	printf("\n\ncurrent : %d\n\n", getCQCurrentCount(q));
+
+	for (int i = 0; i < q->maxElementCount; printf("i%d val %d\n", i, q->elements[i]), ++i)
+		;
 	view(*q);
-	if (isCircularQueueFull(q))
-		error("que가 포화 상태임");
-	printf("[deque 1 번]\n");
-	get(q);
+	clearCircularQueue(q);
+	printf("after cleared\n");
 	view(*q);
-	printf("[enque 2 번]\n");
-	put(q, 'x');
-	put(q, 'y');
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (!put(q, i))
+			printf("%d failed\n", i);
+		else
+			printf("put %d\n", i);
+	}
 	view(*q);
 	deleteCircularQueue(q);
-	return 1;
 }
-
-// CircularQueue* createCircularQueue(int maxElementCount);
-// void deleteCircularQueue(CircularQueue* pQueue);
-// int isCircularQueueFull(CircularQueue* pQueue);
-
-// int put(CircularQueue* pQueue, CircularQueueNode element);
-// int get(CircularQueue* pQueue);
-// void clearCircularQueue(CircularQueue* pQueue);
-
-// int getCQCurrentCount(CircularQueue* pQueue);
-// int getCQMaxCount(CircularQueue* pQueue);

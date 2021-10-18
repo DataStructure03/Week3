@@ -1,70 +1,88 @@
 #include "circularQueue.h"
 
-int error(char *msg)
+CircularQueue *createCircularQueue(int maxElementCount)
 {
-	printf("\033[31n%s\033[37n\n", msg);
-	exit(1);
-	return -1;
-}
-
-CircularQueue* createCircularQueue(int maxElementCount) {
-	CircularQueue* queue = calloc(1, sizeof(CircularQueue));
+	CircularQueue *queue = calloc(1, sizeof(CircularQueue));
 	queue->maxElementCount = maxElementCount;
-	queue->elements =(int *) malloc(maxElementCount);
+	queue->isEmpty = TRUE;
+	queue->elements = (CircularQueueNode *)malloc(maxElementCount * sizeof(CircularQueueNode));
 	return queue;
 }
 
-void deleteCircularQueue(CircularQueue* pQueue) {
+void deleteCircularQueue(CircularQueue *pQueue)
+{
 	free(pQueue->elements);
 	free(pQueue);
 }
 
-int isCircularQueueFull(CircularQueue* pQueue) {
+int isCircularQueueFull(CircularQueue *pQueue)
+{
 	if (!pQueue)
 		return FALSE;
 	return (pQueue->front == (1 + pQueue->rear) % pQueue->maxElementCount);
 }
 
-void moveInCircular(int* target, int diff, int cycleLength) {
+void moveInCircular(int *target, int diff, int cycleLength)
+{
 	*target = (*target + diff) % cycleLength;
 }
 
-int put(CircularQueue* pQueue, CircularQueueNode element) {
+int put(CircularQueue *pQueue, CircularQueueNode element)
+{
 
 	if (!pQueue || isCircularQueueFull(pQueue))
 		return FALSE;
-	moveInCircular(&pQueue->rear, 1, pQueue->maxElementCount);
-	if (getCQCurrentCount(pQueue) == 0)
-		pQueue->front = pQueue->rear;
+
+	if (pQueue->isEmpty)
+	{
+		pQueue->isEmpty = FALSE;
+	}
+	else
+	{
+		moveInCircular(&(pQueue->rear), 1, pQueue->maxElementCount);
+	}
 	pQueue->elements[pQueue->rear] = element;
 	return TRUE;
 }
 
-int get(CircularQueue* pQueue) {
-	
-	if (!pQueue || getCQCurrentCount(pQueue) == 0)
+int get(CircularQueue *pQueue)
+{
+
+	if (!pQueue || pQueue->isEmpty)
 		return FALSE;
 
 	int deletedElement = pQueue->front;
-	
+
 	pQueue->elements[pQueue->front] = 0;
-	if (pQueue->front != pQueue->rear) //when only 1 element exists front == rear, and front should not move 그래도 없을 것 같아용..
+	if (getCQCurrentCount(pQueue) == 1)
+	{
+		pQueue->isEmpty = TRUE;
+	}
+	else
+	{
 		moveInCircular(&pQueue->front, 1, pQueue->maxElementCount);
+	}
+
 	return deletedElement;
 }
 
-void clearCircularQueue(CircularQueue* pQueue) {
+void clearCircularQueue(CircularQueue *pQueue)
+{
 
 	memset(pQueue->elements, 0, pQueue->maxElementCount * sizeof(CircularQueueNode));
 	pQueue->front = 0;
 	pQueue->rear = 0;
+	pQueue->isEmpty = TRUE;
 }
 
-int getCQCurrentCount(CircularQueue* pQueue) {
-	return ((1 + pQueue->rear + pQueue->maxElementCount - pQueue->front)
-		% pQueue->maxElementCount);
+int getCQCurrentCount(CircularQueue *pQueue)
+{
+	if (pQueue->isEmpty)
+		return 0;
+	return ((pQueue->rear + pQueue->maxElementCount - pQueue->front) % pQueue->maxElementCount) + 1;
 }
 
-int getCQMaxCount(CircularQueue* pQueue) {
+int getCQMaxCount(CircularQueue *pQueue)
+{
 	return pQueue->maxElementCount;
 }

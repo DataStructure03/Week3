@@ -11,8 +11,6 @@ Queue*	createQueue(int max)
 	tmp->front = 0;
 	tmp->rear = 0;
 
-	// -1로 시작하는 경우도 보기
-
 	return tmp;
 }
 int		enQueue(Queue *queue, QueueNode element)
@@ -38,10 +36,6 @@ QueueNode	*deQueue(Queue *queue)
 
 	return tmp;
 }
-QueueNode	*peekQueue(Queue *queue)
-{
-	return queue->arr + queue->front;
-}
 
 void	deleteQueue(Queue *queue)
 {
@@ -64,9 +58,4 @@ int isEmpty(Queue *queue)
 		return (FALSE);
 	//return queue->front == queue->rear ? TRUE : FALSE;
 }
-/*
-	arr /QueueNode *
-	maxElementCount /int
-	front /int
-	rear /int
-*/
+

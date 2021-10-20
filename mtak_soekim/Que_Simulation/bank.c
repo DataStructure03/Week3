@@ -4,7 +4,7 @@
 #include "arraylist.h"
 
 #define MAX_WAITING_CUSTOMER 20
-#define MAX_ONGOING_CUSTOMER 5
+#define MAX_ONGOING_CUSTOMER 3
 
 CircularQueue* waiting;
 ArrayList* ongoing;
@@ -49,10 +49,10 @@ void view(CircularQueue q)
 	do
 	{
 		moveInCircular(&i, 1, q.maxElementCount);
-		printf(" arrived time : %d  serviceTime : %d\n", i, q.elements[i].arrivalTime, q.elements[i].serviceTime);
+		printf(" arrived time : %d  serviceTime : %d\n",
+     q.elements[i].arrivalTime, q.elements[i].serviceTime);
 	} while (i != q.rear);
 }
-
 
 void printWaitingCustomers() {
 	printf("Waiting List\n");
@@ -77,8 +77,8 @@ void printCustomerStatus() {
 
 void printAverageWaiting(int endCustomerNumber, int accumulatedTime)
 {
-	printf("\number of visitors : %d\n", endCustomerNumber);
-	printf("\average waiting time : %d\n", accumulatedTime / endCustomerNumber);
+	printf("\n\033[31mnumber of visitors : %d\033[37m\n", endCustomerNumber);
+	printf("\033[31maverage waiting time : %f\033[37m\n", (float)accumulatedTime / (float)endCustomerNumber);
 }
 
 
@@ -90,7 +90,7 @@ void init_rand() {
 int main()
 {
 	int time = 0;
-	int durationTime = 50;
+	int durationTime = 30;
 
 	init_rand();
 	waiting = createCircularQueue(MAX_WAITING_CUSTOMER);
@@ -101,12 +101,12 @@ int main()
 
 	while (time < durationTime)
 	{
-		printf("Time of Now = %d\n", time);
-		if ((rand() % 10) > 5 && !isCircularQueueFull(waiting))
+		printf("\033[32mTime of Now = %d\033[37m\n", time);
+		if ((rand() % 10) > 1 && !isCircularQueueFull(waiting))
 		{
-			int newCustomerNum = rand() % 10 + 1;
-			for (int i = 0; i < newCustomerNum; ++i)
-				insertCustomer(arrival, time, (rand() % 5) + 1);
+			// int newCustomerNum = rand() % 5 + 1;
+			// for (int i = 0; i < newCustomerNum; ++i)
+				insertCustomer(arrival, time, (rand() % 8) + 1);
 		}
 
 		for (int i = 0; i < ongoing->currentElementCount; ++i)
@@ -114,6 +114,7 @@ int main()
 			while (ongoing->pElement[i].endTime == time)
 			{
 				accumulatedTime += ongoing->pElement[i].startTime - ongoing->pElement[i].arrivalTime;
+				printf("\033[34maccumulatedTime : %d\033[37m\n", accumulatedTime);
 				endCustomerNumber++;
 				removeALElement(ongoing, i);
 			}
@@ -121,10 +122,12 @@ int main()
 		for (int i = ongoing->currentElementCount;
 			i < ongoing->maxElementCount && !waiting->isEmpty; ++i)
 		{
+			printf("\033[31m 손님 오셨음 \033[37m\n");
 			SimCustomer nextToService = get(waiting);
 			nextToService.startTime = time;
 			nextToService.endTime = nextToService.startTime + nextToService.serviceTime;
-			int result = addALElement(ongoing, i, nextToService);
+			addALElement(ongoing, i, nextToService);
+		
 		}
 		printCustomerStatus();
 		time++;

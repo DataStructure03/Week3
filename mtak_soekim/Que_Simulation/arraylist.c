@@ -30,7 +30,7 @@ int addALElement(ArrayList *pList, int position, ArrayListNode element)
 {
 	ArrayListNode *tmp;
 
-  if (!pList || pList->currentElementCount < position + 1)
+  if (!pList || position >  pList->currentElementCount)
     return FALSE;
     
 	if (isArrayListFull(pList))

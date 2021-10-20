@@ -4,10 +4,10 @@
 #include "arraylist.h"
 
 #define MAX_WAITING_CUSTOMER 20
-#define MAX_ONGOING_CUSTOMER 10
+#define MAX_ONGOING_CUSTOMER 5
 
-CircularQueue *waiting;
-ArrayList *ongoing;
+CircularQueue* waiting;
+ArrayList* ongoing;
 
 /*
 SimStatus status;
@@ -28,14 +28,14 @@ SimStatus status;
 
 void insertCustomer(SimStatus status, int arrivalTime, int serviceTime)
 {
-  SimCustomer newCustomer;
-  
-  newCustomer.status = status;
-  newCustomer.arrivalTime = arrivalTime;
-  newCustomer.serviceTime = serviceTime;
-  newCustomer.startTime = TIME_UNDECIDED;
-  newCustomer.endTime = TIME_UNDECIDED;
-  put(waiting, newCustomer);
+	SimCustomer newCustomer;
+
+	newCustomer.status = status;
+	newCustomer.arrivalTime = arrivalTime;
+	newCustomer.serviceTime = serviceTime;
+	newCustomer.startTime = TIME_UNDECIDED;
+	newCustomer.endTime = TIME_UNDECIDED;
+	put(waiting, newCustomer);
 }
 
 void view(CircularQueue q)
@@ -49,25 +49,41 @@ void view(CircularQueue q)
 	do
 	{
 		moveInCircular(&i, 1, q.maxElementCount);
-		printf("index[%d] : arrived time : %d  serviceTime : %d\n", i, q.elements[i].arrivalTime, q.elements[i].serviceTime);
+		printf(" arrived time : %d  serviceTime : %d\n", i, q.elements[i].arrivalTime, q.elements[i].serviceTime);
 	} while (i != q.rear);
 }
 
 
-void printWaitingCustomers(){
-  printf("Waiting List\n");
-  view(*waiting);
-  printf("\n\n");
+void printWaitingCustomers() {
+	printf("Waiting List\n");
+	view(*waiting);
+	printf("\n\n");
+}
+
+void printOngoingCustomers() {
+	printf("Ongoing List\n");
+	for (int i = 0;i < ongoing->currentElementCount;++i) {
+		SimCustomer customer =  ongoing->pElement[i];
+		printf("arrived %d, started %d, will end %d\n", customer.arrivalTime, customer.startTime, customer.endTime);
+	}
+}
+
+void printCustomerStatus() {
+	printWaitingCustomers();
+	printOngoingCustomers();
+	printf("\n\n");
 }
 
 
-void printStatus(int endCustomerNumber, int accumulatedTime)
+void printAverageWaiting(int endCustomerNumber, int accumulatedTime)
 {
-	printf("\033[35m 방문자 수 : \033[37m%d\n", endCustomerNumber);
-	printf("\033[35m 평균 대기 시간 : \033[37m%d\n", accumulatedTime / endCustomerNumber);
+	printf("\number of visitors : %d\n", endCustomerNumber);
+	printf("\average waiting time : %d\n", accumulatedTime / endCustomerNumber);
 }
 
-void init_rand(){
+
+
+void init_rand() {
 	srand(time(NULL));
 }
 
@@ -80,22 +96,22 @@ int main()
 	waiting = createCircularQueue(MAX_WAITING_CUSTOMER);
 	ongoing = createArrayList(MAX_ONGOING_CUSTOMER);
 
-	int endCustomerNumber=0;
-	int accumulatedTime= 0;//상담 받다가 끝나면 넌 일을 안한거여.
+	int endCustomerNumber = 0;
+	int accumulatedTime = 0;
 
 	while (time < durationTime)
 	{
-		printf("현재 시각=%d\n", time);
-		int test;
-		if ((test = rand() % 10) > 5 && ! isCircularQueueFull(waiting))
+		printf("Time of Now = %d\n", time);
+		if ((rand() % 10) > 5 && !isCircularQueueFull(waiting))
 		{
-			printf("test : %d\n", test);
-			insertCustomer(arrival, time, /*(rand() % 5) + 1*/ 3);
+			int newCustomerNum = rand() % 10 + 1;
+			for (int i = 0; i < newCustomerNum; ++i)
+				insertCustomer(arrival, time, (rand() % 5) + 1);
 		}
-		
-		for (int i = 0; i < ongoing->currentElementCount ; ++i)
-    	{
-			while(ongoing->pElement[i].endTime == time)
+
+		for (int i = 0; i < ongoing->currentElementCount; ++i)
+		{
+			while (ongoing->pElement[i].endTime == time)
 			{
 				accumulatedTime += ongoing->pElement[i].startTime - ongoing->pElement[i].arrivalTime;
 				endCustomerNumber++;
@@ -103,13 +119,15 @@ int main()
 			}
 		}
 		for (int i = ongoing->currentElementCount;
-    		i <  ongoing->maxElementCount && !waiting->isEmpty ; ++i)
+			i < ongoing->maxElementCount && !waiting->isEmpty; ++i)
 		{
-			addALElement(ongoing, i, get(waiting));
+			SimCustomer nextToService = get(waiting);
+			nextToService.startTime = time;
+			nextToService.endTime = nextToService.startTime + nextToService.serviceTime;
+			int result = addALElement(ongoing, i, nextToService);
 		}
-		printWaitingCustomers();//대기 손님 출력
+		printCustomerStatus();
 		time++;
 	}
-	printStatus(endCustomerNumber, accumulatedTime);//손님들이 평균적으로 대기한 시간 출력
-	
+	printAverageWaiting(endCustomerNumber, accumulatedTime);
 }

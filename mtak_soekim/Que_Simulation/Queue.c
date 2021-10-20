@@ -49,7 +49,6 @@ CircularQueueNode get(CircularQueue *pQueue)
 {
 	CircularQueueNode deletedElement = pQueue->elements[pQueue->front];
 
-	// pQueue->elements[pQueue->front] = ;
 	if (getCQCurrentCount(pQueue) == 1)
 	{
 		pQueue->isEmpty = TRUE;

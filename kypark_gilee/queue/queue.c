@@ -1,5 +1,7 @@
 #include "queue.h"
 #include <stdlib.h>
+#include <string.h>
+
 
 Queue*	createQueue(int max)
 {
@@ -31,7 +33,8 @@ QueueNode	*deQueue(Queue *queue)
 	if (isEmpty(queue))
 		return NULL;
 	QueueNode *tmp = (QueueNode *)calloc(1, sizeof(QueueNode));
-	tmp->data = queue->arr[front].data;
+	//tmp->data = queue->arr[front].data;
+	memcpy(tmp, &queue->arr[front], sizeof(QueueNode));
 	queue->front = front;
 
 	return tmp;

@@ -1,10 +1,24 @@
 #ifndef _QUEUE_
 #define _QUEUE_
 
+
+typedef enum SimStatusType { arrival, start, end } SimStatus;
+typedef struct SimCustomerType
+{
+    SimStatus status;
+    int arrivalTime;
+    int serviceTime;
+    int startTime;
+    int endTime;
+} SimCustomer;
+
+typedef SimCustomer QueueNode;
+/*
 typedef struct QueueNodeType
 {
 	int	data;
 }	QueueNode;
+*/
 typedef struct QueueType
 {
 	int	maxElementCount;
